@@ -1,113 +1,150 @@
-import Image from "next/image";
+"use client"
+import { Label } from "@/components/ui/label";
+
+import { useState } from "react";
 
 export default function Home() {
+  const [insurancePolicy, setInsurancePolicy] = useState<File>();
+  const [driverLicense, setDriverLicense] = useState<File>();
+  const [registrationCertificate, setRegistrationCertificate] = useState<File>();
+  const [fir, setFIR] = useState<File>();
+  const [damagesEstimate, setDamagesEstimate] = useState<File>();
+  const [medicalReport, setMedicalReport] = useState<File>();
+  const [otherExpenses, setOtherExpenses] = useState<File>();
+  const [photographs, setPhotographs] = useState<FileList | null>();
+  const [recipe, setRecipe] = useState('');
+  const [time, setTime] = useState('');
+  
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!insurancePolicy || !driverLicense || !registrationCertificate || !fir || !damagesEstimate || !otherExpenses) return;
+    try {
+      const data = new FormData();
+      data.append('insurancePolicy', insurancePolicy);
+      data.append('driverLicense', driverLicense);
+      data.append('registrationCertificate', registrationCertificate);
+      data.append('fir', fir);
+      data.append('damagesEstimate', damagesEstimate);
+      data.append('medicalReport', medicalReport || '');
+      data.append('otherExpenses', otherExpenses);
+      if (photographs) {
+        for (let i = 0; i < photographs.length; i++) {
+          data.append('photographs', photographs[i]);
+        }
+      }
+      data.append('time', time);
+      
+      const res = await fetch('api/claim', {
+        method: 'POST',
+        body: data,
+      });
+      
+      const temp = await res.json();
+      setRecipe(temp);
+      
+      if (!res.ok) throw new Error(await res.text());
+      
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <main className='p-2 sm:p-5'>
+    <form onSubmit={submit} className='ring-2 ring-white p-3 sm:p-10 rounded-sm flex flex-col gap-6'>
+      {/* Copy of car insurance policy */}
+      <Label htmlFor='insurancePolicy' className='text-lg'>Copy of Your Car Insurance Policy</Label>
+      <input
+        id='insurancePolicy'
+        name='insurancePolicy'
+        type='file'
+        onChange={(e) => setInsurancePolicy(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* Copy of driver's license */}
+      <Label htmlFor='driverLicense' className='text-lg'>Copy of Your Driver’s License</Label>
+      <input
+        id='driverLicense'
+        name='driverLicense'
+        type='file'
+        onChange={(e) => setDriverLicense(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* Copy of car's registration certificate */}
+      <Label htmlFor='registrationCertificate' className='text-lg'>Copy of Your Car’s Registration Certificate</Label>
+      <input
+        id='registrationCertificate'
+        name='registrationCertificate'
+        type='file'
+        onChange={(e) => setRegistrationCertificate(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* First Information Report (FIR) */}
+      <Label htmlFor='fir' className='text-lg'>First Information Report (FIR)</Label>
+      <input
+        id='fir'
+        name='fir'
+        type='file'
+        onChange={(e) => setFIR(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* Estimate of damages and repairs */}
+      <Label htmlFor='damagesEstimate' className='text-lg'>Estimate of Damages and Repairs</Label>
+      <input
+        id='damagesEstimate'
+        name='damagesEstimate'
+        type='file'
+        onChange={(e) => setDamagesEstimate(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* Medical report (only in case of physical injuries) */}
+      <Label htmlFor='medicalReport' className='text-lg'>Medical Report (If Applicable)</Label>
+      <input
+        id='medicalReport'
+        name='medicalReport'
+        type='file'
+        onChange={(e) => setMedicalReport(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* Records of other expenses */}
+      <Label htmlFor='otherExpenses' className='text-lg'>Records of Other Expenses</Label>
+      <input
+        id='otherExpenses'
+        name='otherExpenses'
+        type='file'
+        onChange={(e) => setOtherExpenses(e.target.files?.[0])}
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='.pdf, .jpg, .png'
+      />
+  
+      {/* Photographs */}
+      <Label htmlFor='photographs' className='text-lg'>Photographs (If Available)</Label>
+      <input
+        id='photographs'
+        name='photographs'
+        type='file'
+        onChange={(e) => setPhotographs(e.target.files)}
+        multiple
+        className='h-[40px] max-h-fit w-full p-4 border border-gray-300 rounded-lg mt-2 resize-none focus:outline-none focus:ring focus:border-green-500'
+        accept='image/*'
+      />
+  
+      {/* Submit button */}
+      <input type="submit" value="Submit Claim" className="bg-white text-black hover:font-bold hover:bg-green-500 rounded-md px-4 py-2 hover:text-white mt-2 inline-block" />
+    </form>
+  </main>
+  
   );
 }
